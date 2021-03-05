@@ -1,0 +1,2 @@
+-e .
+idna<3 # required by requests 2.25.1
