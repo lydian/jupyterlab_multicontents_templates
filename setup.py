@@ -9,7 +9,7 @@ from jupyter_packaging import (
     install_npm,
     ensure_targets,
     combine_commands,
-    skip_if_exists
+    skip_if_exists,
 )
 import setuptools
 
@@ -18,7 +18,7 @@ HERE = Path(__file__).parent.resolve()
 # The name of the project
 name = "jupyterlab_multicontents_templates"
 
-lab_path = (HERE / name / "labextension")
+lab_path = HERE / name / "labextension"
 
 # Representative files that should exist after a successful build
 jstargets = [
@@ -33,14 +33,16 @@ labext_name = "jupyterlab_multicontents_templates"
 
 data_files_spec = [
     ("share/jupyter/labextensions/%s" % labext_name, str(lab_path), "**"),
-    ("share/jupyter/labextensions/%s" % labext_name, str(HERE), "install.json"),("etc/jupyter/jupyter_server_config.d",
-     "jupyter-config", "jupyterlab_multicontents_templates.json"),
-    
+    ("share/jupyter/labextensions/%s" % labext_name, str(HERE), "install.json"),
+    (
+        "etc/jupyter/jupyter_server_config.d",
+        "jupyter-config",
+        "jupyterlab_multicontents_templates.json",
+    ),
 ]
 
-cmdclass = create_cmdclass("jsdeps",
-    package_data_spec=package_data_spec,
-    data_files_spec=data_files_spec
+cmdclass = create_cmdclass(
+    "jsdeps", package_data_spec=package_data_spec, data_files_spec=data_files_spec
 )
 
 js_command = combine_commands(
