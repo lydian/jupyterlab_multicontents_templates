@@ -75,6 +75,7 @@ setup_args = dict(
     packages=setuptools.find_packages(),
     install_requires=[
         "jupyterlab~=3.0",
+        "cached_property",
     ],
     zip_safe=False,
     include_package_data=True,
