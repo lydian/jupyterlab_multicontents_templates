@@ -3,9 +3,8 @@ import React from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
 import { requestAPI } from './handler';
 
-
 interface IProperties {
-  previewFunc: any;
+  previewFunc: (path: string, name: string) => void;
   name?: string;
   path?: string;
   isRoot?: boolean;
@@ -13,49 +12,56 @@ interface IProperties {
 
 interface IState {
   expandChild: boolean;
-  items?: {type: string, name: string, path: string}[];
+  items?: { type: string; name: string; path: string }[];
 }
 
 class TemplateFolder extends React.Component<IProperties, IState> {
   constructor(props: Readonly<IProperties>) {
     super(props);
-    this.state = {items: null, expandChild: false};
+    this.state = { items: null, expandChild: false };
   }
   render() {
-    let items: JSX.Element[] = (this.state.items || []).map(item => {
-      if (item.type === "directory") {
-        return <TemplateFolder
-          name={ item.name}
-          path={item.path}
-          isRoot={false}
-          previewFunc={this.props.previewFunc}
-        />
-      }
-      else if (item.type === "notebook") {
-        return <li className="template-item">
-          <a
-            onClick={ () => this.props.previewFunc(item.path, item.name)}
-          >
-            <div>
-              <span className="jp-multicontents-templates-item-icon"></span>
-              <span>{ item.name }</span>
-            </div>
-          </a>
-        </li>;
+    const items: JSX.Element[] = (this.state.items || []).map(item => {
+      if (item.type === 'directory') {
+        return (
+          <TemplateFolder
+            name={item.name}
+            path={item.path}
+            isRoot={false}
+            previewFunc={this.props.previewFunc}
+          />
+        );
+      } else if (item.type === 'notebook') {
+        return (
+          <li className="template-item">
+            <a onClick={() => this.props.previewFunc(item.path, item.name)}>
+              <div>
+                <span className="jp-multicontents-templates-item-icon"></span>
+                <span>{item.name}</span>
+              </div>
+            </a>
+          </li>
+        );
       }
     });
-    if ( this.props.isRoot ) {
-      return <ul className="template-folder"> { items } </ul>;
+    if (this.props.isRoot) {
+      return <ul className="template-folder"> {items} </ul>;
     }
     return (
       <li>
-        <a onClick={ () => this.toggle() }>
-          <div> 
-            <span className={(this.state.items === null)? "jp-multicontents-templates-folded-folder-icon": "jp-multicontents-templates-expanded-folder-icon"}></span>
-            <span>{ this.props.name }</span>
+        <a onClick={() => this.toggle()}>
+          <div>
+            <span
+              className={
+                this.state.items === null
+                  ? 'jp-multicontents-templates-folded-folder-icon'
+                  : 'jp-multicontents-templates-expanded-folder-icon'
+              }
+            ></span>
+            <span>{this.props.name}</span>
           </div>
         </a>
-        <ul>{ items } </ul>
+        <ul>{items} </ul>
       </li>
     );
   }
@@ -67,13 +73,12 @@ class TemplateFolder extends React.Component<IProperties, IState> {
   }
 
   toggle() {
-    let shouldExpand = !this.state.expandChild;
-    this.setState({expandChild: shouldExpand});
+    const shouldExpand = !this.state.expandChild;
+    this.setState({ expandChild: shouldExpand });
     if (shouldExpand) {
-      this.expand()
-    }
-    else{
-      this.setState({items: null});
+      this.expand();
+    } else {
+      this.setState({ items: null });
     }
   }
 
@@ -82,9 +87,12 @@ class TemplateFolder extends React.Component<IProperties, IState> {
       return;
     }
 
-    requestAPI<any>('list', { method: 'PUT', body: JSON.stringify({path: this.props.path})})
+    requestAPI<any>('list', {
+      method: 'PUT',
+      body: JSON.stringify({ path: this.props.path })
+    })
       .then(data => {
-        this.setState({items: data.content});
+        this.setState({ items: data.content });
       })
       .catch(reason => {
         console.error(`Error: ${reason}`);
@@ -92,25 +100,26 @@ class TemplateFolder extends React.Component<IProperties, IState> {
   }
 }
 
+export class TemplateListWidget extends ReactWidget {
+  previewFunc: (path: string, name: string) => void;
 
-export class  TemplateListWidget extends ReactWidget {
-    previewFunc: any;
+  constructor(previewFunc: (path: string, name: string) => void) {
+    super();
+    this.addClass('jp-ReactWidget');
+    this.title.iconClass = 'jp-multicontents-templates-icon';
+    this.title.caption = 'Templates';
+    this.title.closable = true;
+    this.previewFunc = previewFunc;
+  }
 
-    constructor(previewFunc: any) {
-        super();
-        this.addClass('jp-ReactWidget');
-        this.title.iconClass = 'jp-multicontents-templates-icon';
-        this.title.caption = "Templates";
-        this.title.closable = true;
-        this.previewFunc = previewFunc;
-    }
-
-    render(): JSX.Element {
-        return <div className="jp-multicontents-templates">
-            <h1> Templates </h1>
-            <div className="jp-multicontents-templates-list">
-              <TemplateFolder isRoot={ true } previewFunc={this.previewFunc} />
-            </div>
-        </div>;
-    }
+  render(): JSX.Element {
+    return (
+      <div className="jp-multicontents-templates">
+        <h1> Templates </h1>
+        <div className="jp-multicontents-templates-list">
+          <TemplateFolder isRoot={true} previewFunc={this.previewFunc} />
+        </div>
+      </div>
+    );
+  }
 }

@@ -16,7 +16,7 @@ class PreviewWidget extends ReactWidget {
 
   constructor(path: string, name: string, importFunc: any) {
     super();
-    this.name= name;
+    this.name = name;
     this.path = path;
     this.importFunc = importFunc;
   }
@@ -26,25 +26,29 @@ class PreviewWidget extends ReactWidget {
       settings.baseUrl,
       'jupyterlab_multicontents_templates',
       `preview?path=${this.path}`
-    )
-    return <div style={{width: "100%", height: "100%"}}>
-      <div>
-        <input type="button" value="Import" onClick={
-          () => this.importFunc(this.path)
-        } />
+    );
+    return (
+      <div style={{ width: '100%', height: '100%' }}>
+        <div>
+          <input
+            type="button"
+            value="Import"
+            onClick={() => this.importFunc(this.path)}
+          />
+        </div>
+        <iframe style={{ width: '100%', height: '100%' }} src={requestUrl} />
       </div>
-      <iframe style={{ width: '100%', height: '100%' }} src={requestUrl}/>
-    </div>;
+    );
   }
 }
 
 export class MainAreaPreviewWidget extends MainAreaWidget {
-  path: string
-  name: string
+  path: string;
+  name: string;
 
-  constructor(path: string, name:string, commands: any) {
-    super({content: new PreviewWidget(path, name, commands)});
-    this.id = 'MulticontentsTemplates-preview'
+  constructor(path: string, name: string, importFunc: (path: string) => void) {
+    super({ content: new PreviewWidget(path, name, importFunc) });
+    this.id = 'MulticontentsTemplates-preview';
     this.title.label = `Preview: ${name}`;
     this.title.closable = true;
   }

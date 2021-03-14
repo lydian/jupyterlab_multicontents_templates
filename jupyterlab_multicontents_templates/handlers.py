@@ -1,5 +1,4 @@
 import datetime
-import importlib
 import json
 
 import nbformat
@@ -14,15 +13,18 @@ from traitlets.config import Config
 
 def build_manager(config):
     return MultiContentsManager(
-        config=Config({"MultiContentsManager": {"managers": config.get("template_folders", {})}})
+        config=Config(
+            {"MultiContentsManager": {"managers": config.get("template_folders", {})}}
+        )
     )
 
 
 class BaseMixin(object):
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.manager = build_manager(self.config.get("JupyterLabMultiContentsTemplates", {}))
+        self.manager = build_manager(
+            self.config.get("JupyterLabMultiContentsTemplates", {})
+        )
 
     def to_json(self, content):
         def convert_dt(obj):
@@ -40,30 +42,26 @@ class BaseMixin(object):
 
 
 class ContentHandler(BaseMixin, APIHandler):
-
     @tornado.web.authenticated
     def put(self):
-        data  = json.loads(self.request.body)
+        data = json.loads(self.request.body)
         path = data.get("path", None)
         self.finish(self.to_json(self.get_notebook(path)))
 
 
 class PreviewHandler(BaseMixin, IPythonHandler):
-
     def get(self):
         path = self.get_argument("path")
         html_exporter = HTMLExporter()
-        html_exporter.template_name = 'classic'
+        html_exporter.template_name = "classic"
         notebook_node = nbformat.from_dict(self.get_notebook(path).get("content", {}))
         html, _ = html_exporter.from_notebook_node(notebook_node)
         self.finish(html)
 
 
 class ListHandler(BaseMixin, APIHandler):
-
-
     def put(self):
-        data  = json.loads(self.request.body)
+        data = json.loads(self.request.body)
         path = data.get("path", "")
         result = self.manager.get(path, content=True)
         result["content"] = [
@@ -78,13 +76,12 @@ def setup_handlers(web_app):
     host_pattern = ".*$"
 
     base_url = url_path_join(
-        web_app.settings["base_url"],
-        "jupyterlab_multicontents_templates"
+        web_app.settings["base_url"], "jupyterlab_multicontents_templates"
     )
     route_to_handler = {
         "list": ListHandler,
         "preview": PreviewHandler,
-        "content": ContentHandler
+        "content": ContentHandler,
     }
     handlers = [
         (url_path_join(base_url, route), handler)
