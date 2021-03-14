@@ -8,4 +8,4 @@ repos:
     rev: v1.2.3
     hooks:
     - id: flake8
-      exclude: 'jupyter-config/jupyter_config.py'
+      exclude: 'examples/jupyter_config.py'
