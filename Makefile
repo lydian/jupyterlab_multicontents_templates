@@ -10,7 +10,7 @@ watch: venv
 	venv/bin/jlpm run watch&
 	venv/bin/jupyter lab --debug \
 		--autoreload \
-		--config=jupyter-config/jupyter_config.py \
+		--config=examples/jupyter_config.py \
 		--no-browser
 
 

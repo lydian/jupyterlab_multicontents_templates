@@ -56,3 +56,8 @@ jobs:
 
         jupyter labextension list 2>&1 | grep -ie "jupyterlab_multicontents_templates.*OK"
         python -m jupyterlab.browser_check
+    - name: Setup tmate session
+      if: ${{ failure() }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
