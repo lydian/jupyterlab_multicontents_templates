@@ -1,0 +1,134 @@
+:root {
+        --template-icon-dark: url('template-icon-dark.svg');
+        --template-icon-light: url('template-icon-light.svg');
+        --template-icon: var(--template-icon-light);
+        --tempalte-down-arrow-icon-dark: url('down-arrow-dark.svg');
+        --tempalte-down-arrow-icon-light: url('down-arrow-light.svg');
+        --tempalte-down-arrow-icon: var(--tempalte-down-arrow-icon-light);
+        --tempalte-right-arrow-icon-dark: url('right-arrow-dark.svg');
+        --tempalte-right-arrow-icon-light: url('right-arrow-light.svg');
+        --tempalte-right-arrow-icon: var(--tempalte-right-arrow-icon-light);
+}
+
+[data-jp-theme-light="true"] .jp-multicontents-templates-icon {
+  --template-icon: var(--template-icon-light);
+}
+[data-jp-theme-light="false"] .jp-multicontents-templates-icon {
+  --template-icon: var(--template-icon-dark);
+}
+[data-jp-theme-light="true"] .jp-multicontents-templates-item-icon {
+  --template-icon: var(--template-icon-light);
+}
+[data-jp-theme-light="false"] .jp-multicontents-templates-item-icon {
+  --template-icon: var(--template-icon-dark);
+}
+[data-jp-theme-light="true"] .jp-multicontents-templates-expanded-folder-icon {
+  --tempalte-down-arrow-icon: var(--tempalte-down-arrow-icon-light);
+}
+[data-jp-theme-light="false"] .jp-multicontents-templates-expanded-folder-icon {
+  --tempalte-down-arrow-icon: var(--tempalte-down-arrow-icon-dark);
+}
+[data-jp-theme-light="true"] .jp-multicontents-templates-folded-folder-icon {
+  --tempalte-right-arrow-icon: var(--tempalte-right-arrow-icon-light);
+}
+[data-jp-theme-light="false"] .jp-multicontents-templates-folded-folder-icon {
+  --tempalte-right-arrow-icon: var(--tempalte-right-arrow-icon-dark);
+}
+
+
+.jp-multicontents-templates-icon {
+  background-image: var(--template-icon);
+  min-width: 16px;
+  min-height: 16px;
+  background-size: 16px;
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+}
+
+.jp-multicontents-templates-expanded-folder-icon {
+  background-image: var(--tempalte-down-arrow-icon);
+  min-width: var(--jp-ui-font-size0);
+  min-height: var(--jp-ui-font-size0);
+  background-size: var(--jp-ui-font-size0);
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+  padding-right: var(--jp-ui-font-size0);
+}
+
+.jp-multicontents-templates-folded-folder-icon {
+  background-image: var(--tempalte-right-arrow-icon);
+  min-width: var(--jp-ui-font-size0);
+  min-height: var(--jp-ui-font-size0);
+  background-size: var(--jp-ui-font-size0);
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+  padding-right: var(--jp-ui-font-size0);
+}
+
+.jp-multicontents-templates-item-icon {
+  background-image: var(--template-icon);
+  min-width: var(--jp-ui-font-size0);
+  min-height: var(--jp-ui-font-size0);
+  background-size: var(--jp-ui-font-size0);
+  display: inline-block;
+  vertical-align: middle;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin: auto;
+  padding-right: var(--jp-ui-font-size0);
+}
+
+.jp-multicontents-templates {
+  display: flex;
+  flex-direction:  column;
+  background: var(--jp-layout-color1);
+  color: var(--jp-ui-font-color1);
+  font-size: var(--jp-ui-font-size1);
+  height: 100%;
+}
+
+.jp-multicontents-templates-list {
+  height: 100%;
+  overflow: auto;
+}
+
+.jp-multicontents-templates h1 {
+  border-bottom: var(--jp-border-width) solid var(--jp-border-color2);
+  font-size: var(--jp-ui-font-size0);
+  font-weight: 600;
+  letter-spacing: 1px;
+  margin: 0px;
+  padding: 8px 12px;
+  text-transform: uppercase;
+}
+
+.jp-multicontents-templates ul {
+    list-style: none;
+    padding: 5px 0 5px 10px;
+    width: 100%
+}
+
+.jp-multicontents-templates li {
+  width: 100%;
+}
+
+.jp-multicontents-templates li div {
+  width: 100%;
+}
+
+.jp-multicontents-templates li div:hover {
+    background-color: var(--jp-layout-color2);
+}
+
+.jp-multicontents-templates li.template-item {
+  margin: 5px 0 5px 10px; 
+}

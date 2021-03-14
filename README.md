@@ -2,8 +2,9 @@
 
 ![Github Actions Status](https://github.com/lydian/jupyterlab_multicontents_templates/workflows/Build/badge.svg)
 
-Jupyterlab templates from different types of contentsmanager
-
+Inspired by [Jupyterlab-templates](https://pypi.org/project/jupyterlab-templates/) but added extra functions: 
+1. Allow templates from any location, including S3, GCS, psql, etc., just installed the required jupyter contents manager.
+2. Preview notebook before import the template
 
 This extension is composed of a Python package named `jupyterlab_multicontents_templates`
 for the server extension and a NPM package named `jupyterlab_multicontents_templates`
@@ -20,6 +21,38 @@ for the frontend extension.
 pip install jupyterlab_multicontents_templates
 ```
 
+## Config
+
+configure `jupyter_notebook_config.py` with the following settings:
+
+```python
+import os
+from IPython.html.services.contents.filemanager import FileContentsManager
+from s3contents import S3ContentsManager
+
+c.MultiContentsManager.managers = {
+    "templates from Local File": {
+        "manager_class": FileContentsManager,
+        "kwargs": {
+            "root_dir": os.environ["HOME"]
+        },
+    },
+    "templates from S3 prefix1": {
+        "manager_class": S3ContentsManager,
+        "kwargs": {
+            "bucket": "example-bucket",
+            "prefix": "path/to/notebooks",
+        },
+    },
+    "templates from S3 prefix2": {
+        "manager_class": S3ContentsManager,
+        "kwargs": {
+            "bucket": "another-example-bucket",
+            "prefix": "path/to/notebooks",
+        },
+    },
+}
+```
 
 ## Troubleshoot
 

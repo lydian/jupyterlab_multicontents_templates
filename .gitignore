@@ -116,3 +116,9 @@ venv
 
 # yarn
 yarn.lock
+
+# vim
+**/*.swp
+
+# vscode
+.idea

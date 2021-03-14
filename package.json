@@ -47,9 +47,12 @@
   },
   "dependencies": {
     "@jupyterlab/application": "^3.0.0",
+    "@jupyterlab/apputils": "^3.0.5",
     "@jupyterlab/coreutils": "^5.0.0",
-    "@jupyterlab/services": "^6.0.0"
-
+    "@jupyterlab/filebrowser": "^3.0.6",
+    "@jupyterlab/services": "^6.0.0",
+    "@lumino/widgets": "^1.18.0",
+    "react": "^17.0.1"
   },
   "devDependencies": {
     "@jupyterlab/builder": "^3.0.0",
@@ -71,14 +74,14 @@
   "styleModule": "style/index.js",
   "jupyterlab": {
     "discovery": {
-        "server": {
-          "managers": [
-            "pip"
-          ],
-          "base": {
-            "name": "jupyterlab_multicontents_templates"
-          }
+      "server": {
+        "managers": [
+          "pip"
+        ],
+        "base": {
+          "name": "jupyterlab_multicontents_templates"
         }
+      }
     },
     "extension": true,
     "outputDir": "jupyterlab_multicontents_templates/labextension"

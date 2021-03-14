@@ -1,26 +1,24 @@
 PATH := $(CURDIR)/venv/bin:$(PATH)
-
-
 .PHONY: clean watch
 
 venv:
 	python3 -m venv venv
-	pip install -r requirements.txt -r requirements-dev.txt
+	venv/bin/pip install -r requirements.txt -r requirements-dev.txt
 
 
 watch: venv
-	jlpm run watch&
-	jupyter lab --debug \
+	venv/bin/jlpm run watch&
+	venv/bin/jupyter lab --debug \
 		--autoreload \
-		--config=jupyter-config/jupyterlab_multicontents_templates.json \
+		--config=jupyter-config/jupyter_config.py \
 		--no-browser
 
 
 build: venv
-	jlpm run build
-	jlpm run install:extension
-	jupyter lab build
+	venv/bin/jlpm run build
+	venv/bin/jlpm run install:extension
+	venv/bin/jupyter lab build
 
 clean:
-	jlpm run clean:all || echo 'not cleaning jlpm'
+	venv/bin/jlpm run clean:all || echo 'not cleaning jlpm'
 	rm -rf venv/
