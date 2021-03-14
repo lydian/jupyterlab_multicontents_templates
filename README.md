@@ -6,6 +6,9 @@ Inspired by [Jupyterlab-templates](https://pypi.org/project/jupyterlab-templates
 1. Allow templates from any location, including S3, GCS, psql, etc., just installed the required jupyter contents manager.
 2. Preview notebook before import the template
 
+![image](https://user-images.githubusercontent.com/678485/111055020-6733be00-8426-11eb-8f91-98c08653235c.png)
+
+
 This extension is composed of a Python package named `jupyterlab_multicontents_templates`
 for the server extension and a NPM package named `jupyterlab_multicontents_templates`
 for the frontend extension.
