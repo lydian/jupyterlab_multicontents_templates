@@ -33,7 +33,7 @@ import os
 from IPython.html.services.contents.filemanager import FileContentsManager
 from s3contents import S3ContentsManager
 
-c.MultiContentsManager.managers = {
+c.JupyterLabMultiContentsTemplates.template_folders = {
     "templates from Local File": {
         "manager_class": FileContentsManager,
         "kwargs": {
