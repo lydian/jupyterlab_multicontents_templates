@@ -5,13 +5,19 @@
 Inspired by [Jupyterlab-templates](https://pypi.org/project/jupyterlab-templates/) but added extra functions: 
 1. Allow templates from any location, including S3, GCS, psql, etc., just installed the required jupyter contents manager.
 2. Preview notebook before import the template
-
-![image](https://user-images.githubusercontent.com/678485/111055020-6733be00-8426-11eb-8f91-98c08653235c.png)
-
+3. Directly publish notebook as templates into the selected folder with name
 
 This extension is composed of a Python package named `jupyterlab_multicontents_templates`
 for the server extension and a NPM package named `jupyterlab_multicontents_templates`
 for the frontend extension.
+
+
+## Screenshots
+- Use Template with preview 
+![JupyterLab-template-demo](https://user-images.githubusercontent.com/678485/111886962-014bb700-898f-11eb-9a61-ffe86ff7be36.gif)
+
+- Publish notebook to Templates
+![JupyterLab-publish-demo](https://user-images.githubusercontent.com/678485/111886966-07419800-898f-11eb-83dd-a83a5b0c5f3b.gif)
 
 
 ## Requirements
