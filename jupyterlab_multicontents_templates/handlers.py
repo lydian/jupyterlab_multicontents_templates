@@ -12,18 +12,17 @@ from traitlets.config import Config
 
 
 def build_manager(config):
-    return MultiContentsManager(
-        config=Config(
-            {"MultiContentsManager": {"managers": config.get("template_folders", {})}}
-        )
-    )
+    return
 
 
 class BaseMixin(object):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.manager = build_manager(
-            self.config.get("JupyterLabMultiContentsTemplates", {})
+        config = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
+            "template_folders", {}
+        )
+        self.manager = MultiContentsManager(
+            config=Config({"MultiContentsManager": {"managers": config}})
         )
 
     def to_json(self, content):
@@ -59,6 +58,18 @@ class PreviewHandler(BaseMixin, IPythonHandler):
         self.finish(html)
 
 
+class PublishHandler(BaseMixin, APIHandler):
+    def put(self):
+        data = json.loads(self.request.body)
+        notebook = self.contents_manager.get(
+            data["source_path"], type="notebook", content=1
+        )
+        target_path = data["target_path"]
+        output = self.manager.save(notebook, target_path)
+        output["path"] = target_path
+        self.finish({"save": "success", **json.loads(self.to_json(output))})
+
+
 class ListHandler(BaseMixin, APIHandler):
     def put(self):
         data = json.loads(self.request.body)
@@ -82,6 +93,7 @@ def setup_handlers(web_app):
         "list": ListHandler,
         "preview": PreviewHandler,
         "content": ContentHandler,
+        "publish": PublishHandler,
     }
     handlers = [
         (url_path_join(base_url, route), handler)

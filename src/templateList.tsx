@@ -4,7 +4,7 @@ import { ReactWidget } from '@jupyterlab/apputils';
 import { requestAPI } from './handler';
 
 interface IProperties {
-  previewFunc: (path: string, name: string) => void;
+  onSelect: (selected: ISelectedTemplate) => void;
   name?: string;
   path?: string;
   isRoot?: boolean;
@@ -12,29 +12,36 @@ interface IProperties {
 
 interface IState {
   expandChild: boolean;
+  loading: boolean;
   items?: { type: string; name: string; path: string }[];
+}
+
+interface ISelectedTemplate {
+  name: string;
+  path: string;
+  type: string;
 }
 
 class TemplateFolder extends React.Component<IProperties, IState> {
   constructor(props: Readonly<IProperties>) {
     super(props);
-    this.state = { items: null, expandChild: false };
+    this.state = { items: null, expandChild: false, loading: false };
   }
-  render() {
-    const items: JSX.Element[] = (this.state.items || []).map(item => {
+  render(): JSX.Element {
+    let items: JSX.Element[] = (this.state.items || []).map(item => {
       if (item.type === 'directory') {
         return (
           <TemplateFolder
             name={item.name}
             path={item.path}
             isRoot={false}
-            previewFunc={this.props.previewFunc}
+            onSelect={this.props.onSelect}
           />
         );
       } else if (item.type === 'notebook') {
         return (
-          <li className="template-item">
-            <a onClick={() => this.props.previewFunc(item.path, item.name)}>
+          <li className="template-item template-notebook">
+            <a onClick={() => this.props.onSelect(item)}>
               <div>
                 <span className="jp-multicontents-templates-item-icon"></span>
                 <span>{item.name}</span>
@@ -44,11 +51,23 @@ class TemplateFolder extends React.Component<IProperties, IState> {
         );
       }
     });
+    if (this.state.loading) {
+      items = [
+        <li>
+          <div className="loader"></div>
+        </li>
+      ];
+    }
     if (this.props.isRoot) {
-      return <ul className="template-folder"> {items} </ul>;
+      return (
+        <ul className="template-folder multicontents-templates-ul">
+          {' '}
+          {items}{' '}
+        </ul>
+      );
     }
     return (
-      <li>
+      <li className="template-item">
         <a onClick={() => this.toggle()}>
           <div>
             <span
@@ -61,19 +80,24 @@ class TemplateFolder extends React.Component<IProperties, IState> {
             <span>{this.props.name}</span>
           </div>
         </a>
-        <ul>{items} </ul>
+        <ul className="multicontents-templates-ul">{items} </ul>
       </li>
     );
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     if (this.props.isRoot) {
       this.expand();
     }
   }
 
-  toggle() {
+  toggle(): void {
     const shouldExpand = !this.state.expandChild;
+    this.props.onSelect({
+      name: this.props.path,
+      path: this.props.path,
+      type: 'directory'
+    });
     this.setState({ expandChild: shouldExpand });
     if (shouldExpand) {
       this.expand();
@@ -82,44 +106,47 @@ class TemplateFolder extends React.Component<IProperties, IState> {
     }
   }
 
-  expand() {
+  expand(): void {
     if (this.state.items !== null) {
       return;
     }
-
+    this.setState({ loading: true });
     requestAPI<any>('list', {
       method: 'PUT',
       body: JSON.stringify({ path: this.props.path })
     })
       .then(data => {
-        this.setState({ items: data.content });
+        this.setState({ items: data.content, loading: false });
       })
       .catch(reason => {
         console.error(`Error: ${reason}`);
+        this.setState({ loading: false });
       });
   }
 }
 
-export class TemplateListWidget extends ReactWidget {
-  previewFunc: (path: string, name: string) => void;
+class TemplateListWidget extends ReactWidget {
+  onSelect: (selected: ISelectedTemplate) => void;
 
-  constructor(previewFunc: (path: string, name: string) => void) {
+  constructor(onSelect: (selected: ISelectedTemplate) => void) {
     super();
     this.addClass('jp-ReactWidget');
     this.title.iconClass = 'jp-multicontents-templates-icon';
     this.title.caption = 'Templates';
     this.title.closable = true;
-    this.previewFunc = previewFunc;
+    this.onSelect = onSelect;
   }
 
   render(): JSX.Element {
     return (
-      <div className="jp-multicontents-templates">
+      <div className="multicontents-templates">
         <h1> Templates </h1>
-        <div className="jp-multicontents-templates-list">
-          <TemplateFolder isRoot={true} previewFunc={this.previewFunc} />
+        <div className="multicontents-templates-list">
+          <TemplateFolder isRoot={true} onSelect={this.onSelect} />
         </div>
       </div>
     );
   }
 }
+
+export { ISelectedTemplate, TemplateListWidget, TemplateFolder };

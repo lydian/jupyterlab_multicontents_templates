@@ -87,7 +87,7 @@
   padding-right: var(--jp-ui-font-size0);
 }
 
-.jp-multicontents-templates {
+.multicontents-templates {
   display: flex;
   flex-direction:  column;
   background: var(--jp-layout-color1);
@@ -96,12 +96,12 @@
   height: 100%;
 }
 
-.jp-multicontents-templates-list {
+.multicontents-templates-list {
   height: 100%;
   overflow: auto;
 }
 
-.jp-multicontents-templates h1 {
+.multicontents-templates h1 {
   border-bottom: var(--jp-border-width) solid var(--jp-border-color2);
   font-size: var(--jp-ui-font-size0);
   font-weight: 600;
@@ -111,24 +111,44 @@
   text-transform: uppercase;
 }
 
-.jp-multicontents-templates ul {
+.multicontents-templates-ul{
     list-style: none;
     padding: 5px 0 5px 10px;
     width: 100%
 }
 
-.jp-multicontents-templates li {
+.multicontents-item {
   width: 100%;
 }
 
-.jp-multicontents-templates li div {
+.multicontents-item div {
   width: 100%;
 }
 
-.jp-multicontents-templates li div:hover {
+.multicontents-item div:hover {
     background-color: var(--jp-layout-color2);
 }
 
-.jp-multicontents-templates li.template-item {
+.template-notebook {
   margin: 5px 0 5px 10px; 
+}
+
+.multicontents-save-input {
+  width: 100%;
+  border-width: 0 0 1px 0;
+}
+
+/* loader css, copied from https://www.w3schools.com/howto/howto_css_loader.asp */
+.loader {
+  border: 2px solid #f3f3f3; /* Light grey */
+  border-top: 2px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 10px;
+  height: 10px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }

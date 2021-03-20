@@ -22,10 +22,11 @@ class PreviewWidget extends ReactWidget {
   }
   render(): JSX.Element {
     const settings = ServerConnection.makeSettings();
+    const encodedPath = encodeURIComponent(this.path);
     const requestUrl = URLExt.join(
       settings.baseUrl,
       'jupyterlab_multicontents_templates',
-      `preview?path=${this.path}`
+      `preview?path=${encodedPath}`
     );
     return (
       <div style={{ width: '100%', height: '100%' }}>

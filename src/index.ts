@@ -3,9 +3,11 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
-import { TemplateListWidget } from './templateList';
+import { TemplateListWidget, ISelectedTemplate } from './templateList';
 import { MainAreaPreviewWidget } from './preview';
 import { requestAPI } from './handler';
+import { Dialog, showDialog } from '@jupyterlab/apputils';
+import { PublishDialog } from './publishDialog';
 
 /**
  * Initialization data for the jupyterlab_multicontents_templates extension.
@@ -15,9 +17,17 @@ const extension: JupyterFrontEndPlugin<void> = {
   autoStart: true,
   requires: [IFileBrowserFactory],
   activate: (app: JupyterFrontEnd, browser: IFileBrowserFactory) => {
-    const widget = new TemplateListWidget((path: string, name: string) => {
-      app.commands.execute('multicontentTemplates:preview', { path, name });
-    });
+    const previewFunc = (selected: ISelectedTemplate) => {
+      if (selected.type === 'notebook') {
+        app.commands.execute('multicontentTemplates:preview', {
+          path: selected.path,
+          name: selected.name
+        });
+      }
+    };
+
+    const widget = new TemplateListWidget(previewFunc);
+    const { tracker } = browser;
     let mainAreaWidget: MainAreaPreviewWidget | null = null;
     widget.id = 'template:list';
     app.shell.add(widget, 'left');
@@ -76,6 +86,55 @@ const extension: JupyterFrontEndPlugin<void> = {
           });
         });
       }
+    });
+    app.commands.addCommand('multicontentTemplates:publish', {
+      label: 'Publish Notebook',
+      iconClass: 'jp-multicontents-templates-icon',
+      execute: args => {
+        console.log(args);
+        const selectedItem = tracker.currentWidget.selectedItems().next();
+        showDialog({
+          title: 'Publish Location',
+          body: new PublishDialog(selectedItem),
+          buttons: [
+            Dialog.cancelButton(),
+            Dialog.okButton({ label: 'Publish' })
+          ]
+        }).then((value: any) => {
+          if (value.button.label === 'Publish') {
+            console.log(selectedItem, value);
+            requestAPI<any>('publish', {
+              method: 'PUT',
+              body: JSON.stringify({
+                source_path: selectedItem.path,
+                target_path: value.value
+              })
+            })
+              .then(data => {
+                showDialog({
+                  title: 'Success!',
+                  body: `successfully saved template to: ${data.path}`,
+                  buttons: [Dialog.okButton()]
+                });
+              })
+              .catch(data => {
+                showDialog({
+                  title: 'Error',
+                  body: data.message,
+                  buttons: [Dialog.okButton()]
+                });
+              });
+          }
+
+          console.log({ selectedItem, value });
+        });
+      }
+    });
+
+    app.contextMenu.addItem({
+      command: 'multicontentTemplates:publish',
+      selector: '.jp-DirListing-item[data-file-type="notebook"]',
+      rank: 3
     });
 
     console.log(
