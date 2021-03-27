@@ -21,6 +21,7 @@ for the frontend extension.
 ![JupyterLab-publish-demo](https://user-images.githubusercontent.com/678485/111886966-07419800-898f-11eb-83dd-a83a5b0c5f3b.gif)
 
 - Share Templates
+![jupyterlab-share-demo](https://user-images.githubusercontent.com/678485/112735948-5302bd00-8f0c-11eb-97b3-4eac2d74ed41.gif)
 
 
 ## Requirements
