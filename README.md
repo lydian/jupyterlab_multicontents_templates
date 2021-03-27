@@ -2,10 +2,11 @@
 
 ![Github Actions Status](https://github.com/lydian/jupyterlab_multicontents_templates/workflows/Build/badge.svg)
 
-Inspired by [Jupyterlab-templates](https://pypi.org/project/jupyterlab-templates/) but added extra functions: 
+Inspired by [Jupyterlab-templates](https://pypi.org/project/jupyterlab-templates/) but added extra functions:
 1. Allow templates from any location, including S3, GCS, psql, etc., just installed the required jupyter contents manager.
 2. Preview notebook before import the template
 3. Directly publish notebook as templates into the selected folder with name
+4. Share Template URL and directly opened preview
 
 This extension is composed of a Python package named `jupyterlab_multicontents_templates`
 for the server extension and a NPM package named `jupyterlab_multicontents_templates`
@@ -13,11 +14,13 @@ for the frontend extension.
 
 
 ## Screenshots
-- Use Template with preview 
+- Use Template with preview
 ![JupyterLab-template-demo](https://user-images.githubusercontent.com/678485/111886962-014bb700-898f-11eb-9a61-ffe86ff7be36.gif)
 
 - Publish notebook to Templates
 ![JupyterLab-publish-demo](https://user-images.githubusercontent.com/678485/111886966-07419800-898f-11eb-83dd-a83a5b0c5f3b.gif)
+
+- Share Templates
 
 
 ## Requirements
@@ -61,6 +64,9 @@ c.JupyterLabMultiContentsTemplates.template_folders = {
         },
     },
 }
+
+# If you're using jupyterhub please set this value to True to enable sharing:
+c.JupyterLabMultiContentsTemplates.append_hub_user_redirect = True
 ```
 
 ## Troubleshoot

@@ -10,3 +10,6 @@ c.JupyterLabMultiContentsTemplates.template_folders = {
         "kwargs": {"root_dir": os.path.join(os.getcwd(), "examples", "2nd template")},
     },
 }
+
+# Set this value to True if you're using jupyterhub
+c.JupyterLabMultiContentsTemplates.append_hub_user_redirect = False

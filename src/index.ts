@@ -3,11 +3,12 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
-import { TemplateListWidget, ISelectedTemplate } from './templateList';
-import { MainAreaPreviewWidget } from './preview';
-import { requestAPI } from './handler';
 import { Dialog, showDialog } from '@jupyterlab/apputils';
 import { PublishDialog } from './publishDialog';
+import { MainAreaPreviewWidget } from './preview';
+import { TemplateListWidget, ISelectedTemplate } from './templateList';
+import { requestAPI } from './handler';
+import { ShareDialog } from './shareDialog';
 
 /**
  * Initialization data for the jupyterlab_multicontents_templates extension.
@@ -25,8 +26,14 @@ const extension: JupyterFrontEndPlugin<void> = {
         });
       }
     };
+    const onContextMenuFunc = (selected: ISelectedTemplate) => {
+      app.commands.execute('multicontentTemplates:set-context', {
+        path: selected.path,
+        name: selected.name
+      });
+    };
 
-    const widget = new TemplateListWidget(previewFunc);
+    const widget = new TemplateListWidget(previewFunc, onContextMenuFunc);
     const { tracker } = browser;
     let mainAreaWidget: MainAreaPreviewWidget | null = null;
     widget.id = 'template:list';
@@ -91,7 +98,6 @@ const extension: JupyterFrontEndPlugin<void> = {
       label: 'Publish Notebook',
       iconClass: 'jp-multicontents-templates-icon',
       execute: args => {
-        console.log(args);
         const selectedItem = tracker.currentWidget.selectedItems().next();
         showDialog({
           title: 'Publish Location',
@@ -102,7 +108,6 @@ const extension: JupyterFrontEndPlugin<void> = {
           ]
         }).then((value: any) => {
           if (value.button.label === 'Publish') {
-            console.log(selectedItem, value);
             requestAPI<any>('publish', {
               method: 'PUT',
               body: JSON.stringify({
@@ -125,8 +130,6 @@ const extension: JupyterFrontEndPlugin<void> = {
                 });
               });
           }
-
-          console.log({ selectedItem, value });
         });
       }
     });
@@ -135,6 +138,48 @@ const extension: JupyterFrontEndPlugin<void> = {
       command: 'multicontentTemplates:publish',
       selector: '.jp-DirListing-item[data-file-type="notebook"]',
       rank: 3
+    });
+
+    const params = new URLSearchParams(window.location.search);
+    if (
+      params.get('preview') &&
+      params.get('from') === 'multicontentsTemplates'
+    ) {
+      const path = params.get('preview');
+      const name = path.split('/').pop();
+      console.log(`Found preview path: ${path}`);
+      Promise.all([app.restored]).then(() => {
+        app.commands.execute('multicontentTemplates:preview', { path, name });
+      });
+    }
+    let contextItem: ISelectedTemplate;
+    app.commands.addCommand('multicontentTemplates:set-context', {
+      label: 'set context',
+      execute: args => {
+        contextItem = {
+          path: String(args.path),
+          name: String(args.name)
+        } as ISelectedTemplate;
+      }
+    });
+    app.commands.addCommand('multicontentTemplates:share-templates', {
+      label: 'Share Template',
+      execute: args => {
+        showDialog({
+          title: 'Share URL',
+          body: new ShareDialog({
+            path: String(contextItem.path),
+            name: String(contextItem.name),
+            type: 'notebook'
+          }),
+          buttons: [Dialog.okButton()]
+        });
+      }
+    });
+
+    app.contextMenu.addItem({
+      command: 'multicontentTemplates:share-templates',
+      selector: '.template-notebook'
     });
 
     console.log(

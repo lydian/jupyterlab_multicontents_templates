@@ -83,6 +83,20 @@ class ListHandler(BaseMixin, APIHandler):
         self.finish(self.to_json(result))
 
 
+class ServerInfoHandler(APIHandler):
+    def get(self):
+        config = self.config.get("JupyterLabMultiContentsTemplates", {})
+        self.finish(
+            json.dumps(
+                {
+                    "append_hub_user_redirect": config.get(
+                        "append_hub_user_redirect", False
+                    )
+                }
+            )
+        )
+
+
 def setup_handlers(web_app):
     host_pattern = ".*$"
 
@@ -94,6 +108,7 @@ def setup_handlers(web_app):
         "preview": PreviewHandler,
         "content": ContentHandler,
         "publish": PublishHandler,
+        "server-info": ServerInfoHandler,
     }
     handlers = [
         (url_path_join(base_url, route), handler)
