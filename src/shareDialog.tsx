@@ -15,16 +15,14 @@ class ShareDialogContent extends React.Component<IProperties, IState> {
   constructor(props: Readonly<IProperties>) {
     super(props);
     this.state = { shareURL: null };
-    const encodedPath = encodeURIComponent(String(this.props.path));
-    requestAPI<{ append_hub_user_redirect: boolean }>('server-info').then(
-      data => {
-        let path = `/?from=multicontentsTemplates&preview=${encodedPath}`;
-        if (data.append_hub_user_redirect) {
-          path = '/user-redirect' + path;
-        }
-        this.setState({ shareURL: new URL(path, window.location.href).href });
-      }
-    );
+    requestAPI<{ path: string }>('share-link', {
+      method: 'PUT',
+      body: JSON.stringify({ path: this.props.path })
+    }).then(data => {
+      this.setState({
+        shareURL: new URL(data.path, window.location.href).href
+      });
+    });
   }
   render(): JSX.Element {
     if (this.state.shareURL) {

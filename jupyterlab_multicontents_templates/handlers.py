@@ -1,5 +1,7 @@
 import datetime
 import json
+import base64
+import urllib.parse
 
 import nbformat
 import tornado
@@ -83,18 +85,24 @@ class ListHandler(BaseMixin, APIHandler):
         self.finish(self.to_json(result))
 
 
-class ServerInfoHandler(APIHandler):
-    def get(self):
-        config = self.config.get("JupyterLabMultiContentsTemplates", {})
-        self.finish(
-            json.dumps(
-                {
-                    "append_hub_user_redirect": config.get(
-                        "append_hub_user_redirect", False
-                    )
-                }
-            )
+class ShareURLHandler(APIHandler):
+    def put(self):
+        data = json.loads(self.request.body)
+        path = data.get("path", "")
+        append_prefix = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
+            "append_hub_user_redirect", False
         )
+        url = "/user-redirect/" if append_prefix else "/"
+        url += f"?template-preview={urllib.parse.quote(base64.b64encode(path.encode('utf-8')))}"
+        self.finish(json.dumps({"path": url}))
+
+
+class DecodePathHandler(APIHandler):
+    def put(self):
+        data = json.loads(self.request.body)
+        path = data.get("path")
+        decoded_path = base64.b64decode(path).decode("utf-8")
+        self.finish(json.dumps({"path": decoded_path}))
 
 
 def setup_handlers(web_app):
@@ -108,7 +116,8 @@ def setup_handlers(web_app):
         "preview": PreviewHandler,
         "content": ContentHandler,
         "publish": PublishHandler,
-        "server-info": ServerInfoHandler,
+        "share-link": ShareURLHandler,
+        "decode-link": DecodePathHandler,
     }
     handlers = [
         (url_path_join(base_url, route), handler)

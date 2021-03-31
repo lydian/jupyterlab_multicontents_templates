@@ -1,3 +1,6 @@
+#v0.4.0
+- Fixed bug that failed to share on with url escape string
+- Simplify share path
 # v 0.3.0
 - Allow share the template with URL, and people with the same URL with open the preview window on their server
 # v 0.2.0

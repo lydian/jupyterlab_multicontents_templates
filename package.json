@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab_multicontents_templates",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "Jupyterlab templates from different types of contentsmanager ",
   "keywords": [
     "jupyter",

@@ -141,15 +141,18 @@ const extension: JupyterFrontEndPlugin<void> = {
     });
 
     const params = new URLSearchParams(window.location.search);
-    if (
-      params.get('preview') &&
-      params.get('from') === 'multicontentsTemplates'
-    ) {
-      const path = params.get('preview');
-      const name = path.split('/').pop();
-      console.log(`Found preview path: ${path}`);
-      Promise.all([app.restored]).then(() => {
-        app.commands.execute('multicontentTemplates:preview', { path, name });
+    if (params.get('template-preview')) {
+      const path = params.get('template-preview');
+      requestAPI<{ path: string }>('decode-link', {
+        method: 'PUT',
+        body: JSON.stringify({ path })
+      }).then(data => {
+        const path = data.path;
+        const name = data.path.split('/').pop();
+        console.log(`Found preview path: ${path}`);
+        Promise.all([app.restored]).then(() => {
+          app.commands.execute('multicontentTemplates:preview', { path, name });
+        });
       });
     }
     let contextItem: ISelectedTemplate;
