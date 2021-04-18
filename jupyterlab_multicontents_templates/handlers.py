@@ -77,12 +77,49 @@ class ListHandler(BaseMixin, APIHandler):
         data = json.loads(self.request.body)
         path = data.get("path", "")
         result = self.manager.get(path, content=True)
-        result["content"] = [
-            item
-            for item in result["content"] or []
-            if item["type"] in ("notebook", "directory")
-        ]
+        result["content"] = sorted(
+            [
+                item
+                for item in result["content"] or []
+                if item["type"] in ("notebook", "directory")
+            ],
+            key=lambda x: (x["type"] == "notebook", x["path"].lower()),
+        )
         self.finish(self.to_json(result))
+
+
+class RenameHandler(BaseMixin, APIHandler):
+    def put(self):
+        data = json.loads(self.request.body)
+        src_path = data["src_path"]
+        dst_path = data["dst_path"]
+        self.manager.rename_file(src_path, dst_path)
+        self.finish(self.to_json({"new_path": dst_path}))
+
+
+class NewFolderHandler(BaseMixin, APIHandler):
+    def put(self):
+        data = json.loads(self.request.body)
+        new_folder_path = data["new_folder_path"]
+        folder_name = new_folder_path.rstrip("/").rsplit("/", 1)[-1]
+        response = self.manager.save(
+            {
+                "format": "json",
+                "mimetype": None,
+                "content": [],
+                "name": folder_name,
+                "path": new_folder_path,
+            },
+            new_folder_path,
+        )
+        self.finish(self.to_json({"new_folder": new_folder_path, "content": response}))
+
+
+class DeleteHandler(BaseMixin, APIHandler):
+    def put(self):
+        path = json.loads(self.request.body)
+        self.manager.delete_file(path)
+        self.finish(self.to_json({"path": path}))
 
 
 class ShareURLHandler(APIHandler):
@@ -118,6 +155,7 @@ def setup_handlers(web_app):
         "publish": PublishHandler,
         "share-link": ShareURLHandler,
         "decode-link": DecodePathHandler,
+        "rename": RenameHandler,
     }
     handlers = [
         (url_path_join(base_url, route), handler)

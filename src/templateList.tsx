@@ -1,32 +1,42 @@
 import React from 'react';
 
-import { ReactWidget } from '@jupyterlab/apputils';
 import { requestAPI } from './handler';
+import { ISelectedTemplate, TemplateItem } from './templateItem';
 
-interface IProperties {
+interface ITemplateFolderProperties {
   onSelect: (selected: ISelectedTemplate) => void;
   onContextMenu?: (selected: ISelectedTemplate) => void;
+  onFinishEdit?: () => void;
   name?: string;
   path?: string;
-  isRoot?: boolean;
+  level: number;
+  renamePath?: string;
+  showModifiedTime?: boolean;
+  setRenameState?: (func: any) => void;
 }
 
-interface IState {
+interface ITemplateFolderState {
   expandChild: boolean;
   loading: boolean;
-  items?: { type: string; name: string; path: string }[];
+  items?: { type: string; name: string; path: string; last_modified: string }[];
+  renamePath?: string;
 }
 
-interface ISelectedTemplate {
-  name: string;
-  path: string;
-  type: string;
-}
+class TemplateFolder<
+  T extends ITemplateFolderProperties,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  S extends ITemplateFolderState
+> extends React.Component<ITemplateFolderProperties, ITemplateFolderState> {
+  interval: number;
 
-class TemplateFolder extends React.Component<IProperties, IState> {
-  constructor(props: Readonly<IProperties>) {
+  constructor(props: Readonly<T>) {
     super(props);
     this.state = { items: null, expandChild: false, loading: false };
+    if (this.props.setRenameState) {
+      this.props.setRenameState((val: string) => {
+        this.setState({ renamePath: val });
+      });
+    }
   }
   render(): JSX.Element {
     let items: JSX.Element[] = (this.state.items || []).map(item => {
@@ -35,23 +45,29 @@ class TemplateFolder extends React.Component<IProperties, IState> {
           <TemplateFolder
             name={item.name}
             path={item.path}
-            isRoot={false}
+            level={this.props.level + 1}
             onSelect={this.props.onSelect}
             onContextMenu={this.props.onContextMenu}
+            renamePath={this.props.renamePath}
+            onFinishEdit={this.props.onFinishEdit}
+            showModifiedTime={this.props.showModifiedTime}
           />
         );
       } else if (item.type === 'notebook') {
+        const editMode = item.path === this.props.renamePath;
         return (
-          <li className="template-item template-notebook">
-            <a
-              onClick={() => this.props.onSelect(item)}
-              onContextMenu={() => this.props.onContextMenu(item)}
-            >
-              <div>
-                <span className="jp-multicontents-templates-item-icon"></span>
-                <span>{item.name}</span>
-              </div>
-            </a>
+          <li className="template-item configurable-item template-notebook">
+            <TemplateItem
+              name={item.name}
+              type={item.type}
+              path={item.path}
+              lastModified={item.last_modified}
+              showModifiedTime={this.props.showModifiedTime}
+              editMode={editMode}
+              onFinishEdit={this.props.onFinishEdit}
+              onSelect={this.props.onSelect}
+              onContextMenu={this.props.onContextMenu}
+            />
           </li>
         );
       }
@@ -63,7 +79,7 @@ class TemplateFolder extends React.Component<IProperties, IState> {
         </li>
       ];
     }
-    if (this.props.isRoot) {
+    if (this.props.level === 0) {
       return (
         <ul className="template-folder multicontents-templates-ul">
           {' '}
@@ -71,29 +87,35 @@ class TemplateFolder extends React.Component<IProperties, IState> {
         </ul>
       );
     }
+    const editeMode = this.props.path === this.props.renamePath;
+    const classNames = ['template-item'];
+    if (this.props.level > 1) {
+      classNames.push('configurable-item');
+    }
     return (
-      <li className="template-item">
-        <a onClick={() => this.toggle()}>
-          <div>
-            <span
-              className={
-                this.state.items === null
-                  ? 'jp-multicontents-templates-folded-folder-icon'
-                  : 'jp-multicontents-templates-expanded-folder-icon'
-              }
-            ></span>
-            <span>{this.props.name}</span>
-          </div>
-        </a>
+      <li className={classNames.join(' ')}>
+        <TemplateItem
+          name={this.props.name}
+          path={this.props.path}
+          type="directory"
+          editMode={editeMode}
+          expanded={this.state.items !== null}
+          onToggle={this.toggle.bind(this)}
+          onFinishEdit={this.props.onFinishEdit}
+          onContextMenu={this.props.onContextMenu}
+        />
         <ul className="multicontents-templates-ul">{items} </ul>
       </li>
     );
   }
-
-  componentDidMount(): void {
-    if (this.props.isRoot) {
-      this.expand();
+  componentDidUpdate(): void {
+    if (this.state.items && !this.interval) {
+      this.interval = setInterval(() => this.updateItems(false), 3000);
     }
+  }
+
+  componentWillUnmount(): void {
+    clearInterval(this.interval);
   }
 
   toggle(): void {
@@ -105,17 +127,21 @@ class TemplateFolder extends React.Component<IProperties, IState> {
     });
     this.setState({ expandChild: shouldExpand });
     if (shouldExpand) {
-      this.expand();
+      if (this.state.items !== null) {
+        return;
+      }
+      this.updateItems(true);
+      this.setState({ loading: true });
     } else {
       this.setState({ items: null });
+      clearInterval(this.interval);
     }
   }
 
-  expand(): void {
-    if (this.state.items !== null) {
-      return;
+  updateItems(setLoading: boolean): void {
+    if (setLoading) {
+      this.setState({ loading: true });
     }
-    this.setState({ loading: true });
     requestAPI<any>('list', {
       method: 'PUT',
       body: JSON.stringify({ path: this.props.path })
@@ -125,40 +151,14 @@ class TemplateFolder extends React.Component<IProperties, IState> {
       })
       .catch(reason => {
         console.error(`Error: ${reason}`);
-        this.setState({ loading: false });
+        if (setLoading) {
+          this.setState({ loading: false });
+        }
       });
   }
-}
-
-class TemplateListWidget extends ReactWidget {
-  onSelect: (selected: ISelectedTemplate) => void;
-  onContextMenu: (selected: ISelectedTemplate) => void;
-
-  constructor(
-    onSelect: (selected: ISelectedTemplate) => void,
-    onContextMenu?: (selected: ISelectedTemplate) => void
-  ) {
-    super();
-    this.addClass('jp-ReactWidget');
-    this.title.iconClass = 'jp-multicontents-templates-icon';
-    this.title.caption = 'Templates';
-    this.title.closable = true;
-    this.onSelect = onSelect;
-    this.onContextMenu = onContextMenu;
-  }
-
-  render(): JSX.Element {
-    return (
-      <div className="multicontents-templates">
-        <h1> Templates </h1>
-        <TemplateFolder
-          isRoot={true}
-          onSelect={this.onSelect}
-          onContextMenu={this.onContextMenu}
-        />
-      </div>
-    );
+  onFinishEdit(): void {
+    this.setState({ renamePath: null });
   }
 }
 
-export { ISelectedTemplate, TemplateListWidget, TemplateFolder };
+export { TemplateFolder, ITemplateFolderProperties, ITemplateFolderState };

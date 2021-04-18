@@ -46,11 +46,28 @@ class PreviewWidget extends ReactWidget {
 export class MainAreaPreviewWidget extends MainAreaWidget {
   path: string;
   name: string;
+  static _instance?: MainAreaPreviewWidget = null;
 
   constructor(path: string, name: string, importFunc: (path: string) => void) {
     super({ content: new PreviewWidget(path, name, importFunc) });
     this.id = 'MulticontentsTemplates-preview';
     this.title.label = `Preview: ${name}`;
     this.title.closable = true;
+  }
+
+  static makeNewInstance(
+    path: string,
+    name: string,
+    importFunc: (path: string) => void
+  ): MainAreaPreviewWidget {
+    if (this._instance) {
+      this._instance.close();
+    }
+    this._instance = new MainAreaPreviewWidget(path, name, importFunc);
+    return this._instance;
+  }
+
+  static get Instance(): MainAreaPreviewWidget {
+    return this._instance;
   }
 }

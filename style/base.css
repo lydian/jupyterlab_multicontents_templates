@@ -103,6 +103,11 @@
   height: 100%;
 }
 
+.modified-time {
+  color: var(--jp-ui-font-color3);
+  font-size: var(--jp-ui-font-size0);
+}
+
 .multicontents-templates-list {
   height: 100%;
   overflow: auto;
@@ -143,6 +148,13 @@
 .multicontents-save-input {
   width: 100%;
   border-width: 0 0 1px 0;
+}
+
+.template-item div {
+  width: 90%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  height: 16px;
 }
 
 .share-link {

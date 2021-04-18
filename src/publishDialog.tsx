@@ -1,6 +1,7 @@
 import React from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
-import { TemplateFolder, ISelectedTemplate } from './templateList';
+import { TemplateRoot } from './templateRoot';
+import { ISelectedTemplate } from './templateItem';
 
 interface IProperties {
   srcNotebook: { name: string; path: string };
@@ -25,7 +26,7 @@ class PublishSelector extends React.Component<IProperties, IState> {
           onChange={this.handleChange.bind(this)}
           className="multicontents-save-input"
         />
-        <TemplateFolder isRoot={true} onSelect={this.onSelect.bind(this)} />
+        <TemplateRoot level={0} onSelect={this.onSelect.bind(this)} />
       </div>
     );
   }

@@ -1,7 +1,7 @@
 import React from 'react';
 import { ReactWidget } from '@jupyterlab/apputils';
 import { Clipboard } from '@jupyterlab/apputils';
-import { ISelectedTemplate } from './templateList';
+import { ISelectedTemplate } from './templateItem';
 import { requestAPI } from './handler';
 
 interface IProperties {

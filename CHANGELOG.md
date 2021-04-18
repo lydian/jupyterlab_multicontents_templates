@@ -1,3 +1,9 @@
+# v0.5.0
+- allow rename folder and published template
+- automatically refresh shared list of templates
+- show template published time
+- auto wrap long template name (the full name is available in tooltip)
+
 #v0.4.0
 - Fixed bug that failed to share on with url escape string
 - Simplify share path
