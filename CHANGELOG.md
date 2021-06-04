@@ -1,4 +1,6 @@
-#v0.4.0
+# v0.4.1
+- show scroll bar if there are many templates to list
+# v0.4.0
 - Fixed bug that failed to share on with url escape string
 - Simplify share path
 # v 0.3.0

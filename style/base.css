@@ -101,6 +101,8 @@
   color: var(--jp-ui-font-color1);
   font-size: var(--jp-ui-font-size1);
   height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .multicontents-templates-list {
