@@ -82,6 +82,7 @@ setup_args = dict(
         "tornado",
         "jupyter_server",
         "IPython",
+        "jupyter_packaging~=0.7.9"
     ],
     zip_safe=False,
     include_package_data=True,
