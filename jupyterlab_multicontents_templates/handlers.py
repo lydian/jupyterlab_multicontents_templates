@@ -5,8 +5,7 @@ import urllib.parse
 
 import nbformat
 import tornado
-from IPython.html.base.handlers import IPythonHandler
-from jupyter_server.base.handlers import APIHandler
+from jupyter_server.base.handlers import APIHandler, JupyterHandler
 from jupyter_server.utils import url_path_join
 from multicontents import MultiContentsManager
 from nbconvert import HTMLExporter
@@ -50,7 +49,7 @@ class ContentHandler(BaseMixin, APIHandler):
         self.finish(self.to_json(self.get_notebook(path)))
 
 
-class PreviewHandler(BaseMixin, IPythonHandler):
+class PreviewHandler(BaseMixin, JupyterHandler):
     def get(self):
         path = self.get_argument("path")
         html_exporter = HTMLExporter()
