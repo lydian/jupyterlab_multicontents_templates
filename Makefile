@@ -21,4 +21,4 @@ build: venv
 
 clean:
 	venv/bin/jlpm run clean:all || echo 'not cleaning jlpm'
-	rm -rf venv/
+	rm -rf venv node_modules yarn.lock *.egg-info
