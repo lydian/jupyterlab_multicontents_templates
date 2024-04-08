@@ -1,3 +1,6 @@
+# v0.4.2
+- change the preview handler from IPythonHandler to JupyterHandler because it has been moved in later versions of Python.
+- update build system to newer version numbers so the project will build
 # v0.4.1
 - show scroll bar if there are many templates to list
 # v0.4.0
