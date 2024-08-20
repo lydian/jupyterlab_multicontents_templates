@@ -1,3 +1,5 @@
+# v0.4.3
+- Add a flag to allow for sorting template directory contents by name.
 # v0.4.2
 - change the preview handler from IPythonHandler to JupyterHandler because it has been moved in later versions of Python.
 - update build system to newer version numbers so the project will build

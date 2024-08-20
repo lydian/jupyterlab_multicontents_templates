@@ -13,3 +13,6 @@ c.JupyterLabMultiContentsTemplates.template_folders = {
 
 # Set this value to True if you're using jupyterhub
 c.JupyterLabMultiContentsTemplates.append_hub_user_redirect = False
+
+# Set this value to True if you want to sort template directory contents by name (ascending)
+c.JupyterLabMultiContentsTemplates.sort_templates_by_name_asc = False

@@ -68,6 +68,9 @@ c.JupyterLabMultiContentsTemplates.template_folders = {
 
 # If you're using jupyterhub please set this value to True to enable sharing:
 c.JupyterLabMultiContentsTemplates.append_hub_user_redirect = True
+
+# Set this value to True if you want to sort template directory contents by name (ascending)
+c.JupyterLabMultiContentsTemplates.sort_templates_by_name_asc = False
 ```
 
 ## Troubleshoot
