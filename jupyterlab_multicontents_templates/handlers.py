@@ -76,11 +76,20 @@ class ListHandler(BaseMixin, APIHandler):
         data = json.loads(self.request.body)
         path = data.get("path", "")
         result = self.manager.get(path, content=True)
-        result["content"] = [
+        unsorted_content = [
             item
             for item in result["content"] or []
             if item["type"] in ("notebook", "directory")
         ]
+        sort_by_name = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
+            "sort_templates_by_name_asc", False
+        )
+        if sort_by_name and (len(unsorted_content) > 0 and "/" in unsorted_content[0]["path"]):
+          # user argument to sort by name and path is within a directory
+          sorted_content = sorted(unsorted_content, key=lambda x: x["name"])
+          result["content"] = sorted_content
+        else:
+          result["content"] = unsorted_content
         self.finish(self.to_json(result))
 
 
