@@ -1,3 +1,5 @@
+# v0.4.4
+- The templates folder display order now follows the order that they are defined in the config file
 # v0.4.3
 - Add a flag to allow for sorting template directory contents by name.
 # v0.4.2
