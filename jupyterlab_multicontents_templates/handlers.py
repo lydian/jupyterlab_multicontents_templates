@@ -81,15 +81,26 @@ class ListHandler(BaseMixin, APIHandler):
             for item in result["content"] or []
             if item["type"] in ("notebook", "directory")
         ]
+
         sort_by_name = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
             "sort_templates_by_name_asc", False
         )
+
         if sort_by_name and (len(unsorted_content) > 0 and "/" in unsorted_content[0]["path"]):
           # user argument to sort by name and path is within a directory
           sorted_content = sorted(unsorted_content, key=lambda x: x["name"])
-          result["content"] = sorted_content
+          result["content"] = sorted_content     
         else:
-          result["content"] = unsorted_content
+          # root directory list, create sort object based on user template folder definition
+          template_config = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
+              "template_folders", {}
+          )
+          user_folder_keys = list(template_config.keys())
+          user_folder_sort = {}
+          for i in range(len(user_folder_keys)):
+            user_folder_sort[user_folder_keys[i]] = i
+          result["content"] = sorted(unsorted_content, key=lambda x: user_folder_sort[x["name"]])
+
         self.finish(self.to_json(result))
 
 
