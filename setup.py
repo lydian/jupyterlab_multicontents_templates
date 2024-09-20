@@ -74,7 +74,7 @@ setup_args = dict(
     cmdclass=cmdclass,
     packages=setuptools.find_packages(),
     install_requires=[
-        "jupyterlab~=3.0",
+        "jupyterlab~=4.2",
         "multicontents",
         "nbconvert",
         "traitlets",
