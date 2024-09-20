@@ -47,7 +47,7 @@ jobs:
           yarn-
     
     - name: Install dependencies
-      run: python -m pip install -U jupyterlab~=3.0 jupyter_packaging~=0.7.9
+      run: python -m pip install -U jupyterlab~=4.2 jupyter_packaging~=0.7.9
     - name: Build the extension
       run: |
         jlpm
