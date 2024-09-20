@@ -1,3 +1,5 @@
+# v0.4.5
+- Updating dependencies and various blocks of code to ensure extension is compatible with newer versions of jupyterlab
 # v0.4.4
 - The templates folder display order now follows the order that they are defined in the config file
 # v0.4.3

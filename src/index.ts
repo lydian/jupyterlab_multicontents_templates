@@ -3,6 +3,7 @@ import {
   JupyterFrontEndPlugin
 } from '@jupyterlab/application';
 import { IFileBrowserFactory } from '@jupyterlab/filebrowser';
+import { IDefaultFileBrowser } from '@jupyterlab/filebrowser';
 import { Dialog, showDialog } from '@jupyterlab/apputils';
 import { PublishDialog } from './publishDialog';
 import { MainAreaPreviewWidget } from './preview';
@@ -16,8 +17,9 @@ import { ShareDialog } from './shareDialog';
 const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab_multicontents_templates:plugin',
   autoStart: true,
-  requires: [IFileBrowserFactory],
-  activate: (app: JupyterFrontEnd, browser: IFileBrowserFactory) => {
+  requires: [IFileBrowserFactory, IDefaultFileBrowser],
+  activate: (app: JupyterFrontEnd, browser: IFileBrowserFactory, 
+    defaultFileBrowser: IDefaultFileBrowser) => {
     const previewFunc = (selected: ISelectedTemplate) => {
       if (selected.type === 'notebook') {
         app.commands.execute('multicontentTemplates:preview', {
@@ -67,7 +69,7 @@ const extension: JupyterFrontEndPlugin<void> = {
           method: 'PUT',
           body: JSON.stringify({ path })
         }).then(data => {
-          const browserPath = browser.defaultBrowser.model.path;
+          const browserPath = defaultFileBrowser.model.path;
           return new Promise(resolve => {
             app.commands
               .execute('docmanager:new-untitled', {
@@ -101,7 +103,7 @@ const extension: JupyterFrontEndPlugin<void> = {
         const selectedItem = tracker.currentWidget.selectedItems().next();
         showDialog({
           title: 'Publish Location',
-          body: new PublishDialog(selectedItem),
+          body: new PublishDialog(selectedItem.value),
           buttons: [
             Dialog.cancelButton(),
             Dialog.okButton({ label: 'Publish' })
@@ -111,7 +113,7 @@ const extension: JupyterFrontEndPlugin<void> = {
             requestAPI<any>('publish', {
               method: 'PUT',
               body: JSON.stringify({
-                source_path: selectedItem.path,
+                source_path: selectedItem.value['path'],
                 target_path: value.value
               })
             })
