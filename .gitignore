@@ -114,6 +114,9 @@ dmypy.json
 # virtualenv
 venv
 
+# yarn
+yarn.lock
+
 # vim
 **/*.swp
 
