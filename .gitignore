@@ -9,6 +9,15 @@ jupyterlab_multicontents_templates/labextension
 # Created by https://www.gitignore.io/api/python
 # Edit at https://www.gitignore.io/?templates=python
 
+# yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
 ### Python ###
 # Byte-compiled / optimized / DLL files
 __pycache__/
