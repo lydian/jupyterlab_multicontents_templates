@@ -18,8 +18,11 @@ const extension: JupyterFrontEndPlugin<void> = {
   id: 'jupyterlab_multicontents_templates:plugin',
   autoStart: true,
   requires: [IFileBrowserFactory, IDefaultFileBrowser],
-  activate: (app: JupyterFrontEnd, browser: IFileBrowserFactory, 
-    defaultFileBrowser: IDefaultFileBrowser) => {
+  activate: (
+    app: JupyterFrontEnd,
+    browser: IFileBrowserFactory,
+    defaultFileBrowser: IDefaultFileBrowser
+  ) => {
     const previewFunc = (selected: ISelectedTemplate) => {
       if (selected.type === 'notebook') {
         app.commands.execute('multicontentTemplates:preview', {

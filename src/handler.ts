@@ -33,6 +33,7 @@ export async function requestAPI<T>(
   if (data.length > 0) {
     try {
       data = JSON.parse(data);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       console.log('Not a JSON response body.', response);
     }

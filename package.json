@@ -1,6 +1,6 @@
 {
   "name": "jupyterlab_multicontents_templates",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Jupyterlab templates from different types of contentsmanager ",
   "keywords": [
     "jupyter",
@@ -37,8 +37,8 @@
     "clean:lib": "rimraf lib tsconfig.tsbuildinfo",
     "clean:labextension": "rimraf jupyterlab_multicontents_templates/labextension",
     "clean:all": "jlpm run clean:lib && jlpm run clean:labextension",
-    "eslint": "eslint . --ext .ts,.tsx --fix",
-    "eslint:check": "eslint . --ext .ts,.tsx",
+    "eslint": "eslint . --fix",
+    "eslint:check": "eslint .",
     "install:extension": "jupyter labextension develop --overwrite .",
     "prepare": "jlpm run clean && jlpm run build:prod",
     "watch": "run-p watch:src watch:labextension",
@@ -85,5 +85,6 @@
     },
     "extension": true,
     "outputDir": "jupyterlab_multicontents_templates/labextension"
-  }
+  },
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }
