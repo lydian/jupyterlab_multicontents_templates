@@ -34,6 +34,14 @@ class PreviewWidget extends ReactWidget {
           <input
             type="button"
             value="Import"
+            style={{
+              margin: '2px',
+              padding: '2px 5px 2px 5px',
+              color: 'white',
+              backgroundColor: '#0a6de6',
+              border: '2px solid #0a6de6',
+              borderRadius: '2px'
+            }}
             onClick={() => this.importFunc(this.path)}
           />
         </div>

@@ -20,6 +20,7 @@ build: venv
 	venv/bin/jupyter lab build
 
 build-local:
+	jlpm run build
 	pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org --force-reinstall -r requirements.txt
 	python setup.py bdist_wheel
 
