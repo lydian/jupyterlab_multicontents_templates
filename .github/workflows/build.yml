@@ -7,6 +7,13 @@ on:
     - v*
   pull_request:
     branches: '*'
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        type: boolean
+        description: 'Run the build with tmate debugging enabled'
+        required: false
+        default: false
 
 jobs:
   build:
@@ -14,29 +21,31 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
+
     - name: Install node
       uses: actions/setup-node@v1
       with:
        node-version: '22.x'
+
     - name: Install Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.9'
+        python-version: '3.11'
         architecture: 'x64'
-    
-    
+
     - name: Setup pip cache
       uses: actions/cache@v2
       with:
         path: ~/.cache/pip
-        key: pip-3.9-${{ hashFiles('package.json') }}
+        key: pip-3.11-${{ hashFiles('package.json') }}
         restore-keys: |
-          pip-3.9-
+          pip-3.11-
           pip-
 
     - name: Get yarn cache directory path
       id: yarn-cache-dir-path
       run: echo "::set-output name=dir::$(yarn cache dir)"
+
     - name: Setup yarn cache
       uses: actions/cache@v2
       id: yarn-cache # use this to check for `cache-hit` (`steps.yarn-cache.outputs.cache-hit != 'true'`)
@@ -45,9 +54,10 @@ jobs:
         key: yarn-${{ hashFiles('**/yarn.lock') }}
         restore-keys: |
           yarn-
-    
+
     - name: Install dependencies
       run: python -m pip install -U jupyterlab~=4.2 jupyter_packaging~=0.7.9
+
     - name: Build the extension
       run: |
         jlpm
@@ -58,11 +68,7 @@ jobs:
 
         jupyter labextension list 2>&1 | grep -ie "jupyterlab_multicontents_templates.*OK"
         python -m jupyterlab.browser_check
-    - name: Setup tmate session
-      if: ${{ failure() }}
-      uses: mxschmitt/action-tmate@v3
-      with:
-        limit-access-to-actor: true
+
     - name: build 
       run: |
         python -m pip install build wheel jupyter_packaging
@@ -81,3 +87,9 @@ jobs:
       uses: pypa/gh-action-pypi-publish@master
       with:
         password: ${{ secrets.PYPI_API_TOKEN }}
+
+    - name: Setup tmate session
+      if: ${{ github.event_name == 'workflow_dispatch' && inputs.debug_enabled }}
+      uses: mxschmitt/action-tmate@v3
+      with:
+        limit-access-to-actor: true
