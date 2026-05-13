@@ -40,7 +40,17 @@ export async function requestAPI<T>(
   }
 
   if (!response.ok) {
-    throw new ServerConnection.ResponseError(response, data.message || data);
+    console.error(
+      `jupyterlab_multicontents_templates/${endPoint} failed [${response.status}]:`,
+      data.error || data
+    );
+    if (data.traceback) {
+      console.error(data.traceback);
+    }
+    throw new ServerConnection.ResponseError(
+      response,
+      data.error || data.message || data
+    );
   }
 
   return data;

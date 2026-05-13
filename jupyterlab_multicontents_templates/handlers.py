@@ -6,7 +6,7 @@ import urllib.parse
 import nbformat
 import tornado
 from jupyter_server.base.handlers import APIHandler, JupyterHandler
-from jupyter_server.utils import url_path_join
+from jupyter_server.utils import url_path_join, ensure_async
 from multicontents import MultiContentsManager
 from nbconvert import HTMLExporter
 from traitlets.config import Config
@@ -43,63 +43,102 @@ class BaseMixin(object):
 
 class ContentHandler(BaseMixin, APIHandler):
     @tornado.web.authenticated
-    def put(self):
-        data = json.loads(self.request.body)
-        path = data.get("path", None)
-        self.finish(self.to_json(self.get_notebook(path)))
+    async def put(self):
+        try:
+            data = json.loads(self.request.body)
+            path = data.get("path", None)
+            nb_content = await ensure_async(
+                self.get_notebook(path)
+            )
+            self.finish(self.to_json(nb_content))
+        except Exception as e:
+            self.set_status(500)
+            self.finish(f'jupyterlab_multicontents_templates: Error: {str(e)}')
 
 
 class PreviewHandler(BaseMixin, JupyterHandler):
-    def get(self):
-        path = self.get_argument("path")
-        html_exporter = HTMLExporter()
-        html_exporter.template_name = "classic"
-        notebook_node = nbformat.from_dict(self.get_notebook(path).get("content", {}))
-        html, _ = html_exporter.from_notebook_node(notebook_node)
+    async def get(self):
+        try:
+            path = self.get_argument("path")
+            html_exporter = HTMLExporter()
+            html_exporter.template_name = "classic"
+
+            _nb = await ensure_async(
+                self.get_notebook(path)
+            )
+            notebook_node = nbformat.from_dict(
+                _nb.get("content", {})
+            )
+            html, _ = html_exporter.from_notebook_node(notebook_node)
+        except Exception as e:
+            self.set_status(500)
+            self.finish(f'jupyterlab_multicontents_templates: Error: {str(e)}')
+
         self.finish(html)
 
 
 class PublishHandler(BaseMixin, APIHandler):
-    def put(self):
-        data = json.loads(self.request.body)
-        notebook = self.contents_manager.get(
-            data["source_path"], type="notebook", content=1
-        )
-        target_path = data["target_path"]
-        output = self.manager.save(notebook, target_path)
-        output["path"] = target_path
+    async def put(self):
+        try:
+            data = json.loads(self.request.body)
+
+            notebook = await ensure_async(
+                self.contents_manager.get(
+                    data["source_path"], type="notebook", content=1
+                )
+            )
+
+            target_path = data["target_path"]
+
+            output = await ensure_async(
+                self.manager.save(notebook, target_path)
+            )
+            output["path"] = target_path
+        except Exception as e:
+            self.set_status(500)
+            self.finish(f'jupyterlab_multicontents_templates: Error: {str(e)}')
+
         self.finish({"save": "success", **json.loads(self.to_json(output))})
 
 
 class ListHandler(BaseMixin, APIHandler):
-    def put(self):
-        data = json.loads(self.request.body)
-        path = data.get("path", "")
-        result = self.manager.get(path, content=True)
-        unsorted_content = [
-            item
-            for item in result["content"] or []
-            if item["type"] in ("notebook", "directory")
-        ]
+    async def put(self):
+        try:
+            data = json.loads(self.request.body)
 
-        sort_by_name = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
-            "sort_templates_by_name_asc", False
-        )
+            path = data.get("path", "")
 
-        if sort_by_name and (len(unsorted_content) > 0 and "/" in unsorted_content[0]["path"]):
-          # user argument to sort by name and path is within a directory
-          sorted_content = sorted(unsorted_content, key=lambda x: x["name"])
-          result["content"] = sorted_content     
-        else:
-          # root directory list, create sort object based on user template folder definition
-          template_config = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
-              "template_folders", {}
-          )
-          user_folder_keys = list(template_config.keys())
-          user_folder_sort = {}
-          for i in range(len(user_folder_keys)):
-            user_folder_sort[user_folder_keys[i]] = i
-          result["content"] = sorted(unsorted_content, key=lambda x: user_folder_sort[x["name"]])
+            result = await ensure_async(
+                self.manager.get(path, content=True)
+            )
+
+            unsorted_content = [
+                item
+                for item in result["content"] or []
+                if item["type"] in ("notebook", "directory")
+            ]
+
+            sort_by_name = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
+                "sort_templates_by_name_asc", False
+            )
+
+            if sort_by_name and (len(unsorted_content) > 0 and "/" in unsorted_content[0]["path"]):
+                # user argument to sort by name and path is within a directory
+                sorted_content = sorted(unsorted_content, key=lambda x: x["name"])
+                result["content"] = sorted_content
+            else:
+                # root directory list, create sort object based on user template folder definition
+                template_config = self.config.get("JupyterLabMultiContentsTemplates", {}).get(
+                    "template_folders", {}
+                )
+                user_folder_keys = list(template_config.keys())
+                user_folder_sort = {}
+                for i in range(len(user_folder_keys)):
+                    user_folder_sort[user_folder_keys[i]] = i
+                result["content"] = sorted(unsorted_content, key=lambda x: user_folder_sort[x["name"]])
+        except Exception as e:
+            self.set_status(500)
+            self.finish(f'jupyterlab_multicontents_templates: Error: {str(e)}')
 
         self.finish(self.to_json(result))
 

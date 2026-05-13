@@ -117,7 +117,9 @@ const extension: JupyterFrontEndPlugin<void> = {
                 // -- generate filename for the Untitled notebook that is about to be renamed
                 untitledNotebookFilename = model.path;
                 const namesOfAllNotebooks: string[] = [];
-                const requestUrl = `${settings.baseUrl}api/contents`;
+                const requestUrl = browserPath
+                  ? `${settings.baseUrl}api/contents/${browserPath}`
+                  : `${settings.baseUrl}api/contents`;
                 const requestOptions: RequestInit = { method: 'GET' };
                 // list all files in workspace
                 const response = await ServerConnection.makeRequest(
